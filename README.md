@@ -1,5 +1,7 @@
 # Interactive Classroom Platform
 
+> [Русская версия](docs/README-RU.md)
+
 A web application for conducting interactive classes in university auditoriums. The platform increases student engagement during lectures and seminars by using smartphones and laptops for real-time feedback.
 
 ## Overview
