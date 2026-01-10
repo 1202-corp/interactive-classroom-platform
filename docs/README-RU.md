@@ -23,6 +23,6 @@ Interactive Classroom Platform состоит из нескольких комп
 
 ## Компоненты
 
-- [Frontend](front/) - Интерфейсы веб-приложения
-- [Backend API](api/) - Серверная логика
-- [Telegram Bot](bot/) - Интеграция с Telegram
+- [Frontend](https://github.com/1202-corp/interactive-classroom-frontend) - Интерфейсы веб-приложения
+- [Backend API](https://github.com/1202-corp/interactive-classroom-api) - Серверная логика
+- [Telegram Bot](https://github.com/1202-corp/interactive-classroom-telegram-bot) - Интеграция с Telegram
