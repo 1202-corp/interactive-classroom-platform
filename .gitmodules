@@ -7,3 +7,6 @@
 [submodule "bot"]
 	path = bot
 	url = https://github.com/1202-corp/interactive-classroom-telegram-bot.git
+[submodule "docs/internal-docs"]
+	path = docs/internal-docs
+	url = https://github.com/1202-corp/interactive-classroom-internal-docs.git
