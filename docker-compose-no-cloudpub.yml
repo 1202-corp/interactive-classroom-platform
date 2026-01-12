@@ -29,6 +29,7 @@ services:
     environment:
       - DB_HOST=db
       - DB_PORT=5432
+      - PYTHONPATH=/app
     ports:
       - "${API_PORT:-6100}:8000"
     depends_on:
