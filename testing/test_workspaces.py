@@ -2,7 +2,7 @@
 import requests
 from typing import Optional
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://localhost:6100"
 API_BASE = f"{BASE_URL}/api/v1"
 
 

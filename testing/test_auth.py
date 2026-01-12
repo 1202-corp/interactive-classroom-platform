@@ -3,7 +3,7 @@ import requests
 import json
 from typing import Optional, Dict, Any
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://localhost:6100"
 API_BASE = f"{BASE_URL}/api/v1"
 
 
