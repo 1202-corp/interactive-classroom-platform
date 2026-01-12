@@ -18,6 +18,26 @@ services:
       retries: 5
     restart: unless-stopped
 
+  # Database Initialization
+  db-init:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: interactive-classroom-db-init
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-interactive_classroom}
+    depends_on:
+      db:
+        condition: service_healthy
+    command: python -m scripts.init_db
+    restart: "no"
+
   # API Service
   api:
     build:
@@ -35,6 +55,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
     volumes:
       - ./api:/app
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
