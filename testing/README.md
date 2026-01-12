@@ -57,7 +57,7 @@ python testing/test_api.py
 
 ## Test Configuration
 
-Default API base URL: `http://localhost:8000`
+Default API base URL: `http://localhost:6100`
 
 To change the base URL, modify the `BASE_URL` constant in each test file.
 
