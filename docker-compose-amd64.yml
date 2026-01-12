@@ -36,7 +36,7 @@ services:
         condition: service_healthy
     volumes:
       - ./api:/app
-    command: sh -c "export PYTHONPATH=/app && cd /app && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    command: sh -c "cd /app && PYTHONPATH=/app:$PYTHONPATH python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
