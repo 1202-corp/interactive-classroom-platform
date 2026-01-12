@@ -28,3 +28,4 @@ wheels/
 htmlcov/
 .DS_Store
 cloudpub-config/
+.obsidian/
