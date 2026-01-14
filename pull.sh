@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Script to pull all updates including submodules for Raspberry Pi
-# Usage: ./pull.sh [branch]
+# Usage: ./pull.sh [branch] [--debug]
 #   branch - optional branch name (default: current branch)
+#   --debug - show git output (default: hidden)
 
 set -e  # Exit on error
 
@@ -16,25 +17,58 @@ MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 BOLD='\033[1m'
 
+# Parse arguments
+DEBUG_MODE=false
+TARGET_BRANCH=""
+
+for arg in "$@"; do
+    case $arg in
+        --debug)
+            DEBUG_MODE=true
+            ;;
+        *)
+            if [ -z "$TARGET_BRANCH" ] && [[ ! "$arg" =~ ^-- ]]; then
+                TARGET_BRANCH="$arg"
+            fi
+            ;;
+    esac
+done
+
+# Helper function to run git commands with optional output suppression
+run_git() {
+    if [ "$DEBUG_MODE" = true ]; then
+        "$@"
+    else
+        "$@" >/dev/null 2>&1
+    fi
+}
+
+run_git_stdout() {
+    if [ "$DEBUG_MODE" = true ]; then
+        "$@"
+    else
+        "$@" 2>/dev/null
+    fi
+}
+
 # Get the directory where the script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR"
 
 # Get branch from argument or use current branch
-if [ -n "$1" ]; then
-    TARGET_BRANCH="$1"
+if [ -n "$TARGET_BRANCH" ]; then
     CURRENT_BRANCH=$(git branch --show-current)
     
     # Checkout target branch if different from current
     if [ "$CURRENT_BRANCH" != "$TARGET_BRANCH" ]; then
         echo -e "${CYAN}Switching from ${BOLD}$CURRENT_BRANCH${NC}${CYAN} to ${BOLD}$TARGET_BRANCH${NC}..."
-        if ! git checkout "$TARGET_BRANCH" 2>/dev/null; then
+        if ! run_git git checkout "$TARGET_BRANCH"; then
             echo -e "${YELLOW}Branch $TARGET_BRANCH doesn't exist locally, fetching...${NC}"
-            git fetch origin "$TARGET_BRANCH" 2>/dev/null || {
+            run_git git fetch origin "$TARGET_BRANCH" || {
                 echo -e "${RED}${BOLD}Branch $TARGET_BRANCH not found on remote${NC}"
                 exit 1
             }
-            git checkout -b "$TARGET_BRANCH" "origin/$TARGET_BRANCH" || {
+            run_git git checkout -b "$TARGET_BRANCH" "origin/$TARGET_BRANCH" || {
                 echo -e "${RED}${BOLD}Failed to checkout branch $TARGET_BRANCH${NC}"
                 exit 1
             }
@@ -56,7 +90,7 @@ echo -e "${BLUE}Target branch: ${BOLD}$CURRENT_BRANCH${NC}"
 # Pull main repository
 echo ""
 echo -e "${CYAN}Pulling main repository (branch: $CURRENT_BRANCH)...${NC}"
-if ! git pull origin "$CURRENT_BRANCH"; then
+if ! run_git git pull origin "$CURRENT_BRANCH"; then
     echo -e "${RED}${BOLD}Failed to pull main repository${NC}"
     exit 1
 fi
@@ -65,7 +99,7 @@ echo -e "${GREEN}Main repository updated${NC}"
 # Initialize and update submodules
 echo ""
 echo -e "${CYAN}Initializing submodules...${NC}"
-git submodule update --init --recursive
+run_git git submodule update --init --recursive
 
 # Update each submodule to dev branch (or main if dev doesn't exist)
 echo ""
@@ -86,23 +120,23 @@ update_submodule() {
     cd "$submodule_path"
     
     # Fetch all branches
-    git fetch origin 2>/dev/null || true
+    run_git git fetch origin || true
     
     # Check if dev branch exists on remote
-    if git ls-remote --heads origin dev | grep -q dev; then
+    if run_git_stdout git ls-remote --heads origin dev | grep -q dev; then
         target_branch="dev"
-    elif git ls-remote --heads origin main | grep -q main; then
+    elif run_git_stdout git ls-remote --heads origin main | grep -q main; then
         target_branch="main"
     else
         # Try to get default branch
-        target_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")
+        target_branch=$(run_git_stdout git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' || echo "main")
     fi
     
     # Checkout target branch
-    if git show-ref --verify --quiet refs/heads/"$target_branch"; then
-        git checkout "$target_branch"
+    if git show-ref --verify --quiet refs/heads/"$target_branch" 2>/dev/null; then
+        run_git git checkout "$target_branch"
     else
-        git checkout -b "$target_branch" origin/"$target_branch" 2>/dev/null || {
+        run_git git checkout -b "$target_branch" "origin/$target_branch" || {
             echo -e "    ${YELLOW}Warning: Failed to checkout $target_branch in $submodule_name${NC}"
             cd "$SCRIPT_DIR"
             return
@@ -110,7 +144,7 @@ update_submodule() {
     fi
     
     # Pull latest changes
-    if git pull origin "$target_branch"; then
+    if run_git git pull origin "$target_branch"; then
         echo -e "    ${GREEN}$submodule_name updated (branch: $target_branch)${NC}"
     else
         echo -e "    ${YELLOW}Warning: Failed to pull $submodule_name${NC}"
