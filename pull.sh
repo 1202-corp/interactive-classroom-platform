@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Script to pull all updates including submodules for Raspberry Pi
-# Usage: ./pull.sh
+# Usage: ./pull.sh [branch]
+#   branch - optional branch name (default: current branch)
 
 set -e  # Exit on error
 
@@ -15,15 +16,42 @@ MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 BOLD='\033[1m'
 
-echo -e "${CYAN}${BOLD}Starting update process...${NC}"
-
 # Get the directory where the script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR"
 
-# Get current branch (should be dev)
-CURRENT_BRANCH=$(git branch --show-current)
-echo -e "${BLUE}Current branch: ${BOLD}$CURRENT_BRANCH${NC}"
+# Get branch from argument or use current branch
+if [ -n "$1" ]; then
+    TARGET_BRANCH="$1"
+    CURRENT_BRANCH=$(git branch --show-current)
+    
+    # Checkout target branch if different from current
+    if [ "$CURRENT_BRANCH" != "$TARGET_BRANCH" ]; then
+        echo -e "${CYAN}Switching from ${BOLD}$CURRENT_BRANCH${NC}${CYAN} to ${BOLD}$TARGET_BRANCH${NC}..."
+        if ! git checkout "$TARGET_BRANCH" 2>/dev/null; then
+            echo -e "${YELLOW}Branch $TARGET_BRANCH doesn't exist locally, fetching...${NC}"
+            git fetch origin "$TARGET_BRANCH" 2>/dev/null || {
+                echo -e "${RED}${BOLD}Branch $TARGET_BRANCH not found on remote${NC}"
+                exit 1
+            }
+            git checkout -b "$TARGET_BRANCH" "origin/$TARGET_BRANCH" || {
+                echo -e "${RED}${BOLD}Failed to checkout branch $TARGET_BRANCH${NC}"
+                exit 1
+            }
+        fi
+    fi
+    CURRENT_BRANCH="$TARGET_BRANCH"
+else
+    # Use current branch if no argument provided
+    CURRENT_BRANCH=$(git branch --show-current)
+    if [ -z "$CURRENT_BRANCH" ]; then
+        echo -e "${RED}${BOLD}Not on any branch. Please specify a branch: ./pull.sh <branch>${NC}"
+        exit 1
+    fi
+fi
+
+echo -e "${CYAN}${BOLD}Starting update process...${NC}"
+echo -e "${BLUE}Target branch: ${BOLD}$CURRENT_BRANCH${NC}"
 
 # Pull main repository
 echo ""
