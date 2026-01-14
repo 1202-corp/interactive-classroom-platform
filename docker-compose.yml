@@ -10,7 +10,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "${DB_PORT:-6101}:5432"
+      - "${DB_PORT:-10201}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
       interval: 10s
@@ -51,7 +51,7 @@ services:
       - DB_PORT=5432
       - PYTHONPATH=/app
     ports:
-      - "${API_PORT:-6100}:8000"
+      - "${API_PORT:-10200}:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -67,34 +67,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-
-  # CloudPub Init (creates config directories)
-  cloudpub-init:
-    image: alpine:latest
-    container_name: interactive-classroom-cloudpub-init
-    volumes:
-      - ./cloudpub-config:/cloudpub-config
-    command: sh -c "mkdir -p /cloudpub-config/cloudpub-api && chmod -R 777 /cloudpub-config"
-    restart: "no"
-
-  # CloudPub for API (ARM64)
-  cloudpub-api:
-    image: cloudpub/cloudpub:latest-arm64
-    restart: unless-stopped
-    network_mode: host
-    env_file:
-      - .env
-    environment:
-      - TOKEN=${CLOUDPUB_TOKEN}
-      - HTTP=localhost:${API_PORT:-6100}
-    command: run
-    depends_on:
-      api:
-        condition: service_started
-      cloudpub-init:
-        condition: service_completed_successfully
-    volumes:
-      - ./cloudpub-config/cloudpub-api:/home/cloudpub
 
 volumes:
   postgres_data:
