@@ -90,11 +90,17 @@ echo -e "${BLUE}Target branch: ${BOLD}$CURRENT_BRANCH${NC}"
 # Pull main repository
 echo ""
 echo -e "${CYAN}Pulling main repository (branch: $CURRENT_BRANCH)...${NC}"
+BEFORE_COMMIT=$(git rev-parse HEAD 2>/dev/null || echo "")
 if ! run_git git pull origin "$CURRENT_BRANCH"; then
     echo -e "${RED}${BOLD}Failed to pull main repository${NC}"
     exit 1
 fi
-echo -e "${GREEN}Main repository updated${NC}"
+AFTER_COMMIT=$(git rev-parse HEAD 2>/dev/null || echo "")
+if [ "$BEFORE_COMMIT" = "$AFTER_COMMIT" ] && [ -n "$BEFORE_COMMIT" ]; then
+    echo -e "${YELLOW}Main repository: already up to date${NC}"
+else
+    echo -e "${GREEN}Main repository updated${NC}"
+fi
 
 # Initialize and update submodules
 echo ""
@@ -144,8 +150,14 @@ update_submodule() {
     fi
     
     # Pull latest changes
+    SUBMODULE_BEFORE=$(git rev-parse HEAD 2>/dev/null || echo "")
     if run_git git pull origin "$target_branch"; then
-        echo -e "    ${GREEN}$submodule_name updated (branch: $target_branch)${NC}"
+        SUBMODULE_AFTER=$(git rev-parse HEAD 2>/dev/null || echo "")
+        if [ "$SUBMODULE_BEFORE" = "$SUBMODULE_AFTER" ] && [ -n "$SUBMODULE_BEFORE" ]; then
+            echo -e "    ${YELLOW}$submodule_name: already up to date (branch: $target_branch)${NC}"
+        else
+            echo -e "    ${GREEN}$submodule_name updated (branch: $target_branch)${NC}"
+        fi
     else
         echo -e "    ${YELLOW}Warning: Failed to pull $submodule_name${NC}"
     fi
