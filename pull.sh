@@ -87,11 +87,11 @@ fi
 echo -e "${CYAN}${BOLD}Starting update process...${NC}"
 echo -e "${BLUE}Target branch: ${BOLD}$CURRENT_BRANCH${NC}"
 
-# Pull main repository
+# Pull main repository with submodules
 echo ""
 echo -e "${CYAN}Pulling main repository (branch: $CURRENT_BRANCH)...${NC}"
 BEFORE_COMMIT=$(git rev-parse HEAD 2>/dev/null || echo "")
-if ! run_git git pull origin "$CURRENT_BRANCH"; then
+if ! run_git git pull --recurse-submodules origin "$CURRENT_BRANCH"; then
     echo -e "${RED}${BOLD}Failed to pull main repository${NC}"
     exit 1
 fi
