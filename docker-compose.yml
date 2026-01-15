@@ -79,7 +79,7 @@ services:
       dockerfile: docker/Dockerfile
     container_name: interactive-classroom-front
     ports:
-      - ${FRONT_PORT:-3000}:80
+      - ${FRONT_PORT:-10202}:80
     depends_on:
       - api
     restart: unless-stopped
