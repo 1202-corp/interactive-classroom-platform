@@ -102,11 +102,10 @@ else
     echo -e "${GREEN}Main repository updated${NC}"
 fi
 
-# Initialize and update submodules to latest commits on their branches
+# Initialize and update submodules
 echo ""
-echo -e "${CYAN}Initializing and updating submodules to latest commits...${NC}"
+echo -e "${CYAN}Initializing submodules...${NC}"
 run_git git submodule update --init --recursive
-run_git git submodule update --remote --merge --recursive
 
 # Update each submodule to dev branch (or main if dev doesn't exist)
 echo ""
