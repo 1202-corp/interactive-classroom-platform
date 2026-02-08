@@ -25,7 +25,12 @@ push_repo() {
   if [ "${ahead:-0}" -gt 0 ]; then
     echo "==> Pushing $name (${ahead} commit(s) ahead)"
     if [ "$no_upstream" = 1 ]; then
-      (cd "$dir" && git push -u origin "$(git branch --show-current)" "$@")
+      branch=$(cd "$dir" && git branch --show-current)
+      if [ -z "$branch" ]; then
+        echo "==> $name: detached HEAD, skip (checkout a branch to push)"
+      else
+        (cd "$dir" && git push -u origin "$branch" "$@")
+      fi
     else
       (cd "$dir" && git push "$@")
     fi

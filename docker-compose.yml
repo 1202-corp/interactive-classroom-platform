@@ -19,6 +19,9 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+  # Database web platform
+
+  
   # Database Initialization
   db-init:
     build:
@@ -38,6 +41,17 @@ services:
         condition: service_healthy
     command: sh -c "python -m scripts.init_db && tail -f /dev/null"
     restart: no
+  # Database Web UI
+  db-admin:
+    image: adminer:4
+    container_name: interactive-classroom-db-admin
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    ports:
+      - ${DB_ADMIN_PORT:-10203}:8080
+    depends_on:
+      - db
+    restart: unless-stopped
   # API Service
   api:
     build:
