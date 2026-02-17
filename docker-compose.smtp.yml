@@ -1,0 +1,24 @@
+services:
+  postfix:
+    image: boky/postfix:latest
+    container_name: icplatform-postfix
+    hostname: icplatform.1202-corp.ru
+    domainname: 1202-corp.ru
+    environment:
+      - ALLOWED_SENDER_DOMAINS=1202-corp.ru
+      - POSTFIX_myhostname=icplatform.1202-corp.ru
+      - POSTFIX_mail_name=ICP Mail
+    ports:
+      - ${SMTP_PORT:-10204}:587
+    volumes:
+      - postfix_data:/var/spool/postfix
+      - postfix_etc:/etc/postfix
+      - opendkim:/etc/opendkim
+    restart: unless-stopped
+    networks:
+      - interactive-classroom-network
+
+volumes:
+  postfix_data:
+  postfix_etc:
+  opendkim:
