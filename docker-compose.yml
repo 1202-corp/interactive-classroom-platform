@@ -19,6 +19,8 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    networks:
+      - interactive-classroom-network
   # Database web platform
 
   
@@ -41,6 +43,8 @@ services:
         condition: service_healthy
     command: sh -c "python -m scripts.init_db && tail -f /dev/null"
     restart: no
+    networks:
+      - interactive-classroom-network
   # Database Web UI
   db-admin:
     image: adminer:4
@@ -52,6 +56,8 @@ services:
     depends_on:
       - db
     restart: unless-stopped
+    networks:
+      - interactive-classroom-network
   # API Service
   api:
     build:
@@ -86,6 +92,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    networks:
+      - interactive-classroom-network
   # Frontend Service
   front:
     build:
@@ -103,6 +111,10 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    networks:
+      - interactive-classroom-network
 volumes:
   postgres_data: null
-networks: {}
+networks:
+  interactive-classroom-network:
+    driver: bridge
