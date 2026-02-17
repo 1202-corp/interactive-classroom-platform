@@ -15,8 +15,6 @@ services:
       - postfix_etc:/etc/postfix
       - opendkim:/etc/opendkim
     restart: unless-stopped
-    networks:
-      - interactive-classroom-network
 
 volumes:
   postfix_data:
