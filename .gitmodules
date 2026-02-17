@@ -13,4 +13,4 @@
 [submodule "docs/internal-docs"]
 	path = docs/internal-docs
 	url = https://github.com/1202-modules/interactive-classroom-internal-docs.git
-	branch = main
+	branch = dev
