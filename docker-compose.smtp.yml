@@ -14,6 +14,7 @@ services:
       - postfix_data:/var/spool/postfix
       - postfix_etc:/etc/postfix
       - opendkim:/etc/opendkim
+      - ./smtp-keys:/etc/opendkim/keys
     restart: unless-stopped
 
 volumes:
