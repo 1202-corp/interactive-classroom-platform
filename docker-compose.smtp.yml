@@ -8,7 +8,6 @@ services:
       - ALLOWED_SENDER_DOMAINS=1202-corp.ru
       - POSTFIX_myhostname=icplatform.1202-corp.ru
       - POSTFIX_mail_name=ICP Mail
-      # SASL: логин/пароль для клиентов (API). Формат: email:password
       - SMTPD_SASL_USERS=${SMTP_USER:-noreply@1202-corp.ru}:${SMTP_PASSWORD}
     ports:
       - ${SMTP_PORT:-10204}:587
@@ -25,3 +24,7 @@ volumes:
   postfix_data:
   postfix_etc:
   opendkim:
+
+networks:
+  interactive-classroom-network:
+    driver: bridge
