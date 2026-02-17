@@ -29,6 +29,7 @@ htmlcov/
 .DS_Store
 cloudpub-config/
 .obsidian/
+smtp-keys/
 
 # Folder for testing
 testing/
