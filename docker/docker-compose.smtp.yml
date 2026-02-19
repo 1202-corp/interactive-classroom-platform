@@ -35,12 +35,12 @@ services:
       - SMTP_DOMAIN=${SMTP_DOMAIN}
     volumes:
       - ./smtp-keys:/smtp-keys:rw
-      - ./docker/smtp-init.sh:/smtp-init.sh:ro
+      - ./docker:/scripts:ro
     command: >
       sh -c "
         apk add --no-cache bash &&
         cd /smtp-keys &&
-        SMTP_DOMAIN=$${SMTP_DOMAIN} KEYS_DIR=/smtp-keys bash /smtp-init.sh
+        SMTP_DOMAIN=$${SMTP_DOMAIN} KEYS_DIR=/smtp-keys bash /scripts/smtp-init.sh
       "
     depends_on:
       postfix:
