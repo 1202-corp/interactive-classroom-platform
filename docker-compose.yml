@@ -25,8 +25,8 @@ services:
   # Database Initialization
   db-init:
     build:
-      context: .
-      dockerfile: docker/Dockerfile.api
+      context: https://github.com/1202-modules/interactive-classroom-api.git#dev
+      dockerfile: Dockerfile
     container_name: interactive-classroom-db-init
     environment:
       DB_HOST: db
@@ -57,8 +57,8 @@ services:
   # API Service
   api:
     build:
-      context: .
-      dockerfile: docker/Dockerfile.api
+      context: https://github.com/1202-modules/interactive-classroom-api.git#dev
+      dockerfile: Dockerfile
     container_name: interactive-classroom-api
     environment:
       API_TITLE: ${API_TITLE:-Interactive Classroom Platform API}
@@ -99,8 +99,6 @@ services:
         condition: service_healthy
       db-init:
         condition: service_started
-    volumes:
-      - ./api:/app
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     restart: unless-stopped
     healthcheck:
@@ -119,8 +117,8 @@ services:
   # Frontend Service
   front:
     build:
-      context: .
-      dockerfile: docker/Dockerfile.front
+      context: https://github.com/1202-modules/interactive-classroom-frontend.git#dev
+      dockerfile: docker/Dockerfile
     container_name: interactive-classroom-front
     ports:
       - ${FRONT_PORT:-10202}:80
