@@ -1,14 +1,16 @@
 services:
   postfix:
     image: boky/postfix:latest
-    container_name: icplatform-postfix
-    hostname: icplatform.1202-corp.ru
-    domainname: 1202-corp.ru
+    container_name: smtp-postfix
+    hostname: ${SMTP_HOSTNAME}.${SMTP_DOMAIN}
+    domainname: ${SMTP_DOMAIN}
     environment:
-      - ALLOWED_SENDER_DOMAINS=1202-corp.ru
-      - POSTFIX_myhostname=icplatform.1202-corp.ru
+      - ALLOWED_SENDER_DOMAINS=${SMTP_DOMAIN}
+      - POSTFIX_myhostname=${SMTP_HOSTNAME}.${SMTP_DOMAIN}
       - POSTFIX_mail_name=ICP Mail
-      - SMTPD_SASL_USERS=${SMTP_USER:-noreply@1202-corp.ru}:${SMTP_PASSWORD}
+      - SMTPD_SASL_USERS=${SMTP_USER}:${SMTP_PASSWORD}
+      - DKIM_AUTOGENERATE=1
+      - DKIM_SELECTOR=mail
     ports:
       - ${SMTP_PORT:-10204}:587
     volumes:
@@ -17,6 +19,33 @@ services:
       - opendkim:/etc/opendkim
       - ./smtp-keys:/etc/opendkim/keys
     restart: unless-stopped
+    networks:
+      - interactive-classroom-network
+    healthcheck:
+      test: ["CMD", "postfix", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  smtp-init:
+    image: alpine:latest
+    container_name: smtp-init
+    environment:
+      - SMTP_DOMAIN=${SMTP_DOMAIN}
+    volumes:
+      - ./smtp-keys:/smtp-keys:rw
+      - ./docker/smtp-init.sh:/smtp-init.sh:ro
+    command: >
+      sh -c "
+        apk add --no-cache bash &&
+        cd /smtp-keys &&
+        SMTP_DOMAIN=$${SMTP_DOMAIN} KEYS_DIR=/smtp-keys bash /smtp-init.sh
+      "
+    depends_on:
+      postfix:
+        condition: service_healthy
+    restart: "no"
     networks:
       - interactive-classroom-network
 
