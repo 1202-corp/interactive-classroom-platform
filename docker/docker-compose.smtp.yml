@@ -29,19 +29,15 @@ services:
       start_period: 20s
 
   smtp-init:
-    image: alpine:latest
+    build:
+      context: smtp
+      dockerfile: Dockerfile.smtp-init
     container_name: smtp-init
     environment:
       - SMTP_DOMAIN=${SMTP_DOMAIN}
+      - KEYS_DIR=/smtp-keys
     volumes:
       - ./smtp-keys:/smtp-keys:rw
-      - ./docker:/scripts:ro
-    command: >
-      sh -c "
-        apk add --no-cache bash &&
-        cd /smtp-keys &&
-        SMTP_DOMAIN=$${SMTP_DOMAIN} KEYS_DIR=/smtp-keys bash /scripts/smtp-init.sh
-      "
     depends_on:
       postfix:
         condition: service_healthy

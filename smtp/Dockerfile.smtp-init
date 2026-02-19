@@ -1,0 +1,10 @@
+FROM alpine:latest
+
+# Copy the init script into the image
+COPY smtp-init.sh /smtp-init.sh
+RUN chmod +x /smtp-init.sh
+
+# Install bash (needed for the script)
+RUN apk add --no-cache bash
+
+ENTRYPOINT ["/smtp-init.sh"]
