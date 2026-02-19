@@ -17,7 +17,7 @@ services:
       - postfix_data:/var/spool/postfix
       - postfix_etc:/etc/postfix
       - opendkim:/etc/opendkim
-      - ./smtp-keys:/etc/opendkim/keys
+      - smtp_keys:/etc/opendkim/keys
     restart: unless-stopped
     networks:
       - interactive-classroom-network
@@ -37,7 +37,7 @@ services:
       - SMTP_DOMAIN=${SMTP_DOMAIN}
       - KEYS_DIR=/smtp-keys
     volumes:
-      - ./smtp-keys:/smtp-keys:rw
+      - smtp_keys:/smtp-keys:rw
     depends_on:
       postfix:
         condition: service_healthy
@@ -49,6 +49,7 @@ volumes:
   postfix_data:
   postfix_etc:
   opendkim:
+  smtp_keys:
 
 networks:
   interactive-classroom-network:

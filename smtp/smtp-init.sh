@@ -5,7 +5,7 @@
 set -e
 
 DOMAIN="${SMTP_DOMAIN:?SMTP_DOMAIN is required}"
-KEYS_DIR="${KEYS_DIR:-./smtp-keys}"
+KEYS_DIR="${KEYS_DIR:-/smtp-keys}"
 DOMAIN_DIR="${KEYS_DIR}/${DOMAIN}"
 TXT_FILE="${DOMAIN_DIR}/${DOMAIN}.txt"
 README_FILE="${KEYS_DIR}/README-DNS.md"
