@@ -6,8 +6,8 @@ set -e
 
 DOMAIN="${SMTP_DOMAIN:?SMTP_DOMAIN is required}"
 KEYS_DIR="${KEYS_DIR:-/smtp-keys}"
-DOMAIN_DIR="${KEYS_DIR}/${DOMAIN}"
-TXT_FILE="${DOMAIN_DIR}/${DOMAIN}.txt"
+# boky/postfix writes keys as keys/DOMAIN.txt (not keys/DOMAIN/DOMAIN.txt)
+TXT_FILE="${KEYS_DIR}/${DOMAIN}.txt"
 README_FILE="${KEYS_DIR}/README-DNS.md"
 
 # Wait for keys to be generated (with timeout)
@@ -76,15 +76,14 @@ After adding the DNS record, wait for DNS propagation (can take a few minutes to
 ### Notes
 
 - The DKIM selector is \`mail\` (default)
-- Keys are stored in: \`${DOMAIN_DIR}/\`
-- Private key: \`${DOMAIN}.private\` (keep secure, do not share)
-- Public key (DNS): \`${DOMAIN}.txt\`
+- Private key: \`${KEYS_DIR}/${DOMAIN}.private\` (keep secure, do not share)
+- Public key (DNS): \`${KEYS_DIR}/${DOMAIN}.txt\`
 
 ### Regenerating Keys
 
 If you need to regenerate keys:
 1. Stop the postfix container
-2. Delete \`${DOMAIN_DIR}/\` directory
+2. Delete \`${KEYS_DIR}/${DOMAIN}.private\` and \`${KEYS_DIR}/${DOMAIN}.txt\`
 3. Restart the container - keys will be regenerated automatically
 4. Update the DNS record with the new TXT value
 
