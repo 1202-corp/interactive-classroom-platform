@@ -1,15 +1,15 @@
 [submodule "api"]
 	path = api
 	url = https://github.com/1202-modules/interactive-classroom-api.git
-	branch = dev
+	branch = .
 [submodule "front"]
 	path = front
 	url = https://github.com/1202-modules/interactive-classroom-frontend.git
-	branch = dev
+	branch = .
 [submodule "bot"]
 	path = bot
 	url = https://github.com/1202-modules/interactive-classroom-telegram-bot.git
-	branch = dev
+	branch = .
 [submodule "docs/internal-docs"]
 	path = docs/internal-docs
 	url = https://github.com/1202-modules/interactive-classroom-internal-docs.git
