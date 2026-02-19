@@ -25,7 +25,7 @@ services:
   # Database Initialization
   db-init:
     build:
-      context: ./api
+      context: https://github.com/1202-modules/interactive-classroom-api.git#${API_GIT_REF:-main}
       dockerfile: Dockerfile
     container_name: interactive-classroom-db-init
     environment:
@@ -57,7 +57,7 @@ services:
   # API Service
   api:
     build:
-      context: ./api
+      context: https://github.com/1202-modules/interactive-classroom-api.git#${API_GIT_REF:-main}
       dockerfile: Dockerfile
     container_name: interactive-classroom-api
     environment:
@@ -117,7 +117,7 @@ services:
   # Frontend Service
   front:
     build:
-      context: ./frontend
+      context: https://github.com/1202-modules/interactive-classroom-frontend.git#${FRONTEND_GIT_REF:-main}
       dockerfile: docker/Dockerfile
     container_name: interactive-classroom-front
     ports:
