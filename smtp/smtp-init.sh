@@ -26,8 +26,9 @@ if [ ! -f "$TXT_FILE" ]; then
     exit 1
 fi
 
-# Extract the TXT record content from the .txt file
-TXT_RECORD=$(grep -v "^;" "$TXT_FILE" | tr -d '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+# Parse .txt: subdomain (first column) and clean TXT value (inside parentheses, no quotes/brackets)
+SUBDOMAIN=$(grep -v "^;" "$TXT_FILE" | head -1 | awk '{print $1}')
+TXT_RECORD=$(grep -v "^;" "$TXT_FILE" | tr -d '\n' | sed -n 's/.*(\(.*\)).*/\1/p' | sed 's/"//g' | sed 's/[[:space:]][[:space:]]*/ /g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
 # Create README with DNS instructions
 cat > "$README_FILE" <<EOF
@@ -40,8 +41,8 @@ After the postfix container has generated DKIM keys, add the following DNS TXT r
 ### DNS Record
 
 **Record Type:** TXT  
-**Name/Host:** \`mail._domainkey\`  
-**Value:** (see below)
+**Name/Host (Subdomain):** \`${SUBDOMAIN}\`  
+**Value (Text):** (see below)
 
 ### TXT Record Value
 
@@ -56,7 +57,7 @@ ${TXT_RECORD}
 For domain \`${DOMAIN}\`, add:
 
 \`\`\`
-mail._domainkey.${DOMAIN}    IN    TXT    "${TXT_RECORD}"
+${SUBDOMAIN}.${DOMAIN}    IN    TXT    "${TXT_RECORD}"
 \`\`\`
 
 ### Verification
@@ -65,7 +66,7 @@ After adding the DNS record, wait for DNS propagation (can take a few minutes to
 
 1. Check DNS propagation:
    \`\`\`bash
-   dig TXT mail._domainkey.${DOMAIN}
+   dig TXT ${SUBDOMAIN}.${DOMAIN}
    \`\`\`
 
 2. Test email signing:
@@ -92,21 +93,14 @@ EOF
 echo "✓ DNS instructions created: $README_FILE"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "DKIM DNS TXT Record for domain: ${DOMAIN}"
+echo "DKIM — что вписать в DNS (domain: ${DOMAIN})"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "Record Type: TXT"
-echo "Name/Host: mail._domainkey"
-echo "Full Name: mail._domainkey.${DOMAIN}"
+echo "Subdomain (имя/хост записи):"
+echo "${SUBDOMAIN}"
 echo ""
-echo "TXT Record Value (copy this entire string):"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "Text (значение TXT — скопируйте целиком):"
 echo "${TXT_RECORD}"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "Next steps:"
-echo "1. Add the TXT record above to your DNS for: mail._domainkey.${DOMAIN}"
-echo "2. Wait for DNS propagation (can take minutes to hours)"
-echo "3. Verify with: dig TXT mail._domainkey.${DOMAIN}"
-echo ""
-echo "Full instructions are also saved in: $README_FILE"
+echo "Полное имя записи: ${SUBDOMAIN}.${DOMAIN}"
+echo "Подробная инструкция: $README_FILE"
