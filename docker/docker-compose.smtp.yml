@@ -30,7 +30,7 @@ services:
 
   smtp-init:
     build:
-      context: smtp
+      context: ../smtp
       dockerfile: Dockerfile.smtp-init
     container_name: smtp-init
     environment:
