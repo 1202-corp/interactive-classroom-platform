@@ -117,7 +117,7 @@ services:
   # Frontend Service
   front:
     build:
-      context: ./frontend
+      context: ./front
       dockerfile: docker/Dockerfile
     container_name: interactive-classroom-front
     ports:
