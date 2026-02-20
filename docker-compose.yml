@@ -63,8 +63,8 @@ services:
     environment:
       API_TITLE: ${API_TITLE:-Interactive Classroom Platform API}
       API_VERSION: ${API_VERSION:-1.0.0}
-      DB_HOST: ${DB_HOST:-db}
-      DB_PORT: ${DB_PORT:-5432}
+      DB_HOST: db
+      DB_PORT: 5432
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       DB_NAME: ${DB_NAME:-interactive_classroom}
