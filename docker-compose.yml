@@ -87,6 +87,8 @@ services:
       VERIFICATION_CODE_EXPIRE_MINUTES: ${VERIFICATION_CODE_EXPIRE_MINUTES:-15}
       VERIFICATION_CODE_LENGTH: ${VERIFICATION_CODE_LENGTH:-6}
       GUEST_TOKEN_EXPIRE_DAYS: ${GUEST_TOKEN_EXPIRE_DAYS:-90}
+      PARTICIPANT_TOKEN_EXPIRE_HOURS: ${PARTICIPANT_TOKEN_EXPIRE_HOURS:-7}
+      SESSION_JOIN_FINGERPRINT_LIMIT: ${SESSION_JOIN_FINGERPRINT_LIMIT:-3}
       ANONYMOUS_SLUG_PREFIX: ${ANONYMOUS_SLUG_PREFIX:-anon_}
       ANONYMOUS_DISPLAY_NAME_PREFIX: ${ANONYMOUS_DISPLAY_NAME_PREFIX:-Guest_}
       CLOUDPUB_TOKEN: ${CLOUDPUB_TOKEN:-your-cloudpub-token}
@@ -117,7 +119,7 @@ services:
   # Frontend Service
   front:
     build:
-      context: ./frontend
+      context: ./front
       dockerfile: docker/Dockerfile
     container_name: interactive-classroom-front
     ports:
